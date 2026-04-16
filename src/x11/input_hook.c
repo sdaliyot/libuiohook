@@ -353,6 +353,7 @@ void hook_event_proc(XPointer closeure, XRecordInterceptData *recorded_data) {
             event.data.keyboard.keycode = scancode;
             event.data.keyboard.rawcode = keysym;
             event.data.keyboard.keychar = CHAR_UNDEFINED;
+            event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
             logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X pressed. (%#X)\n",
                     __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
@@ -447,6 +448,7 @@ void hook_event_proc(XPointer closeure, XRecordInterceptData *recorded_data) {
             event.data.keyboard.keycode = scancode;
             event.data.keyboard.rawcode = keysym;
             event.data.keyboard.keychar = CHAR_UNDEFINED;
+            event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
             logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X released. (%#X)\n",
                     __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);

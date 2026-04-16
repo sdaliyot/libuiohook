@@ -261,6 +261,7 @@ static inline void process_key_pressed(uint64_t timestamp, CGEventRef event_ref)
     event.data.keyboard.keycode = keycode_to_scancode(keycode);
     event.data.keyboard.rawcode = keycode;
     event.data.keyboard.keychar = CHAR_UNDEFINED;
+    event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
     logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X pressed. (%#X)\n",
             __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
@@ -361,6 +362,7 @@ static inline void process_key_released(uint64_t timestamp, CGEventRef event_ref
     event.data.keyboard.keycode = keycode_to_scancode(keycode);
     event.data.keyboard.rawcode = keycode;
     event.data.keyboard.keychar = CHAR_UNDEFINED;
+    event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
     logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X released. (%#X)\n",
             __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);

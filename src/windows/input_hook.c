@@ -186,39 +186,28 @@ static void process_key_pressed(KBDLLHOOKSTRUCT *kbhook) {
     event.data.keyboard.keycode = keycode_to_scancode(kbhook->vkCode, kbhook->flags);
     event.data.keyboard.rawcode = (uint16_t) kbhook->vkCode;
     event.data.keyboard.keychar = CHAR_UNDEFINED;
+    event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
-    logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X pressed. (%#X)\n",
+    logger(LOG_LEVEL_INFO, "%s [%u]: Key %#X pressed. (%#X)\n",
             __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 
+    // Buffer for unicode typed chars. No more than 2 needed.
+    WCHAR buffer[2]; // = { WCH_NONE };
+
+    // If a unicode char exists...
+    SIZE_T count = keycode_to_unicode(kbhook->vkCode, buffer, sizeof(buffer));
+    if (count > 0) {
+        event.data.keyboard.keychar = buffer[0];
+        logger(LOG_LEVEL_INFO, "%s [%u]: Key %#X typed. (%#X)\n",
+                __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.keychar);
+    }
+    if (count > 1) {
+        event.data.keyboard.keychar2 = buffer[1];
+        logger(LOG_LEVEL_INFO, "%s [%u]: Key %#X typed. (%#X)\n",
+                __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.keychar2);
+    }
     // Populate key pressed event.
     dispatch_event(&event);
-
-    // If the pressed event was not consumed...
-    if (event.reserved ^ 0x01) {
-        // Buffer for unicode typed chars. No more than 2 needed.
-        WCHAR buffer[2]; // = { WCH_NONE };
-
-        // If the pressed event was not consumed and a unicode char exists...
-        SIZE_T count = keycode_to_unicode(kbhook->vkCode, buffer, sizeof(buffer));
-        for (unsigned int i = 0; i < count; i++) {
-            // Populate key typed event.
-            event.time = kbhook->time;
-            event.reserved = 0x00;
-
-            event.type = EVENT_KEY_TYPED;
-            event.mask = get_modifiers();
-
-            event.data.keyboard.keycode = VC_UNDEFINED;
-            event.data.keyboard.rawcode = (uint16_t) kbhook->vkCode;
-            event.data.keyboard.keychar = buffer[i];
-
-            logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X typed. (%lc)\n",
-                    __FUNCTION__, __LINE__, event.data.keyboard.keycode, (wint_t) event.data.keyboard.keychar);
-
-            // Fire key typed event.
-            dispatch_event(&event);
-        }
-    }
 }
 
 static void process_key_released(KBDLLHOOKSTRUCT *kbhook) {
@@ -245,6 +234,7 @@ static void process_key_released(KBDLLHOOKSTRUCT *kbhook) {
     event.data.keyboard.keycode = keycode_to_scancode(kbhook->vkCode, kbhook->flags);
     event.data.keyboard.rawcode = (uint16_t) kbhook->vkCode;
     event.data.keyboard.keychar = CHAR_UNDEFINED;
+    event.data.keyboard.keychar2 = CHAR_UNDEFINED;
 
     logger(LOG_LEVEL_DEBUG, "%s [%u]: Key %#X released. (%#X)\n",
             __FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
